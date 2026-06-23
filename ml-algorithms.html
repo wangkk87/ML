@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ML Algorithms — Interactive Reference</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f6fa;--surface:#eef0f6;--card:#ffffff;--card2:#f0f2f8;
+  --border:#dde1ee;--border2:#c8cde0;
+  --text:#1a1d2e;--muted:#5a6080;--dim:#9aa0bc;
+  --blue:#2563eb;--blue-dim:#dbeafe;--blue-glow:#2563eb30;
+  --purple:#7c3aed;--purple-dim:#ede9fe;
+  --teal:#0d9488;--teal-dim:#ccfbf1;
+  --amber:#d97706;--amber-dim:#fef3c7;
+  --pink:#db2777;--pink-dim:#fce7f3;
+  --green:#16a34a;--green-dim:#dcfce7;
+  --coral:#e11d48;
+  --font-display:'Space Grotesk',sans-serif;
+  --font-body:'Inter',sans-serif;
+  --font-mono:'JetBrains Mono',monospace;
+  --r:10px;--r-lg:16px;
+}
+html.dark{
+  --bg:#0d0f14;--surface:#13161e;--card:#1a1e2a;--card2:#1f2436;
+  --border:#2a2f42;--border2:#353c55;
+  --text:#e8eaf0;--muted:#7a82a0;--dim:#4a5070;
+  --blue:#4f8ef7;--blue-dim:#1e3a6e;--blue-glow:#4f8ef740;
+  --purple:#a78bfa;--purple-dim:#2d1f6e;
+  --teal:#2dd4bf;--teal-dim:#0d3d38;
+  --amber:#fbbf24;--amber-dim:#3d2a00;
+  --pink:#f472b6;--pink-dim:#3d1230;
+  --green:#4ade80;--green-dim:#0d3320;
+  --coral:#fb7185;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.7;min-height:100vh}
+
+/* NAV */
+nav{position:sticky;top:0;z-index:100;background:var(--surface);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;display:flex;align-items:center;gap:0;height:56px}
+.nav-logo{font-family:var(--font-display);font-size:17px;font-weight:700;color:var(--text);margin-right:2rem;white-space:nowrap}
+.nav-logo span{color:var(--blue)}
+.nav-tabs{display:flex;gap:4px;overflow-x:auto;flex:1}
+.nav-tab{padding:6px 14px;border-radius:6px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;white-space:nowrap;border:none;background:none;transition:all .15s}
+.nav-tab:hover{color:var(--text);background:var(--card)}
+.nav-tab.active{color:var(--blue);background:var(--blue-dim)}
+.nav-search{margin-left:auto;position:relative;flex-shrink:0}
+.nav-search input{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:5px 12px 5px 32px;font-size:13px;color:var(--text);font-family:var(--font-body);outline:none;width:180px;transition:border-color .15s}
+.nav-search input:focus{border-color:var(--blue)}
+.nav-search svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--muted)}
+
+/* HERO */
+.hero{padding:5rem 2rem 3rem;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 0%, #1e3a6e44 0%, transparent 70%);pointer-events:none}
+.hero-eyebrow{font-size:12px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin-bottom:1rem}
+.hero h1{font-family:var(--font-display);font-size:clamp(2rem,5vw,3.5rem);font-weight:700;line-height:1.1;margin-bottom:1rem}
+.hero h1 em{font-style:normal;color:var(--blue)}
+.hero-sub{color:var(--muted);max-width:520px;margin:0 auto 2rem;font-size:16px}
+.hero-chips{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:3rem}
+.chip{padding:4px 12px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--border2);color:var(--muted);cursor:pointer;transition:all .15s}
+.chip:hover,.chip.on{border-color:var(--blue);color:var(--blue);background:var(--blue-dim)}
+
+/* DECISION TREE SECTION */
+.section{padding:2rem;max-width:1100px;margin:0 auto}
+.section-title{font-family:var(--font-display);font-size:20px;font-weight:700;margin-bottom:1.5rem;display:flex;align-items:center;gap:10px}
+.section-title .dot{width:8px;height:8px;border-radius:50%;background:var(--blue)}
+
+/* FLOWCHART */
+.flowchart-wrap{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden}
+.flowchart-toolbar{padding:.75rem 1rem;border-bottom:1px solid var(--border);display:flex;gap:8px;align-items:center}
+.tb-btn{padding:4px 12px;border-radius:6px;font-size:12px;font-weight:500;border:1px solid var(--border2);background:none;color:var(--muted);cursor:pointer;transition:all .15s}
+.tb-btn:hover{border-color:var(--blue);color:var(--blue)}
+.flowchart-canvas{overflow:auto;cursor:grab;user-select:none}
+.flowchart-canvas:active{cursor:grabbing}
+.flowchart-inner{padding:2rem;min-width:640px;transition:transform .2s}
+
+/* SVG FLOWCHART */
+#flow-svg{display:block;width:100%;max-width:780px;margin:0 auto}
+
+/* ALGORITHM CARDS GRID */
+.algo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.algo-card{background:var(--card);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;cursor:pointer;transition:border-color .2s,transform .15s}
+.algo-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.algo-card.open{border-color:var(--blue)}
+.algo-header{padding:1.25rem 1.25rem .75rem;display:flex;align-items:flex-start;gap:12px}
+.algo-icon{width:40px;height:40px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.algo-meta{flex:1}
+.algo-name{font-family:var(--font-display);font-size:16px;font-weight:700;margin-bottom:2px}
+.algo-type{font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;display:inline-block}
+.algo-desc{padding:0 1.25rem .75rem;font-size:13px;color:var(--muted);line-height:1.6}
+.algo-tags{padding:0 1.25rem 1rem;display:flex;gap:6px;flex-wrap:wrap}
+.tag{font-size:11px;padding:2px 8px;border-radius:4px;background:var(--card2);color:var(--dim);border:1px solid var(--border)}
+.algo-expand{max-height:0;overflow:hidden;transition:max-height .35s ease}
+.algo-card.open .algo-expand{max-height:900px}
+.algo-body{padding:1.25rem;border-top:1px solid var(--border)}
+.algo-body h4{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:.6rem;margin-top:1rem}
+.algo-body h4:first-child{margin-top:0}
+.algo-body p{font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:.5rem}
+.algo-body ul{padding-left:1rem;font-size:13px;color:var(--muted);line-height:1.8}
+.code-block{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:.75rem 1rem;font-family:var(--font-mono);font-size:12px;color:#a8d8a8;overflow-x:auto;margin:.5rem 0}
+.pro-con{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:.5rem}
+.pro-con-box{padding:.6rem .75rem;border-radius:6px;font-size:12px;line-height:1.6}
+.pro-con-box.pro{background:var(--green-dim);color:#a8f0c0;border:1px solid #1a5c30}
+.pro-con-box.con{background:var(--pink-dim);color:#f4a0b8;border:1px solid #5c1a2a}
+.pro-con-box strong{display:block;margin-bottom:3px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;opacity:.7}
+
+/* VIZ PANEL */
+.viz-panel{background:var(--card2);border-radius:8px;padding:1rem;margin-top:.75rem;min-height:180px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.viz-panel canvas{display:block}
+.viz-label{position:absolute;bottom:8px;right:10px;font-size:10px;color:var(--dim);font-family:var(--font-mono)}
+
+/* COMPLEXITY TABLE */
+.table-wrap{overflow-x:auto;margin-top:1rem}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{padding:.6rem 1rem;text-align:left;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);border-bottom:1px solid var(--border);background:var(--card)}
+td{padding:.6rem 1rem;border-bottom:1px solid var(--border);color:var(--text)}
+tr:hover td{background:var(--card2)}
+.badge{display:inline-block;padding:1px 7px;border-radius:4px;font-size:11px;font-weight:600}
+.badge.good{background:var(--green-dim);color:var(--green)}
+.badge.mid{background:var(--amber-dim);color:var(--amber)}
+.badge.bad{background:var(--pink-dim);color:var(--coral)}
+
+/* FOOTER */
+footer{text-align:center;padding:3rem 2rem;color:var(--dim);font-size:13px;border-top:1px solid var(--border);margin-top:3rem}
+
+/* HIDDEN */
+.hidden{display:none!important}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+
+/* THEME TOGGLE */
+.theme-toggle{width:36px;height:36px;border-radius:50%;border:1px solid var(--border2);background:var(--card);cursor:pointer;display:flex;align-items:center;justify-content:center;margin-left:12px;flex-shrink:0;transition:border-color .2s,background .2s,transform .15s;color:var(--muted)}
+.theme-toggle:hover{border-color:var(--blue);color:var(--blue);transform:rotate(12deg)}
+.theme-toggle svg{width:16px;height:16px;transition:opacity .2s}
+.theme-toggle .icon-moon{display:block}
+.theme-toggle .icon-sun{display:none}
+html.dark .theme-toggle .icon-moon{display:none}
+html.dark .theme-toggle .icon-sun{display:block}
+
+/* Light mode adjustments for code + pro/con boxes */
+.pro-con-box.pro{background:var(--green-dim);color:#166534;border:1px solid #bbf7d0}
+.pro-con-box.con{background:var(--pink-dim);color:#9d174d;border:1px solid #fbcfe8}
+html.dark .pro-con-box.pro{background:#0d3320;color:#a8f0c0;border-color:#1a5c30}
+html.dark .pro-con-box.con{background:#3d1230;color:#f4a0b8;border-color:#5c1a2a}
+.code-block{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:.75rem 1rem;font-family:var(--font-mono);font-size:12px;color:#166534;overflow-x:auto;margin:.5rem 0}
+html.dark .code-block{background:var(--bg);color:#a8d8a8}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo">ML<span>.</span>ref</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showTab('overview')">Overview</button>
+    <button class="nav-tab" onclick="showTab('supervised')">Supervised</button>
+    <button class="nav-tab" onclick="showTab('unsupervised')">Unsupervised</button>
+    <button class="nav-tab" onclick="showTab('compare')">Compare</button>
+  </div>
+  <div class="nav-search">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    <input type="text" placeholder="Search algorithms…" id="search-input" oninput="filterAlgos(this.value)">
+  </div>
+  <button class="theme-toggle" onclick="toggleTheme()" aria-label="Toggle dark mode">
+    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+  </button>
+</nav>
+
+<!-- HERO -->
+<div class="hero" id="tab-overview">
+  <div class="hero-eyebrow">Interactive Reference</div>
+  <h1>Machine Learning<br><em>Algorithms</em> Explained</h1>
+  <p class="hero-sub">From linear regression to XGBoost — visualizations, code snippets, pros & cons, and when to use each.</p>
+  <div class="hero-chips">
+    <span class="chip on" onclick="filterType('all',this)">All</span>
+    <span class="chip" onclick="filterType('regression',this)">Regression</span>
+    <span class="chip" onclick="filterType('classification',this)">Classification</span>
+    <span class="chip" onclick="filterType('clustering',this)">Clustering</span>
+    <span class="chip" onclick="filterType('ensemble',this)">Ensemble</span>
+    <span class="chip" onclick="filterType('dimensionality',this)">Dimensionality</span>
+  </div>
+
+  <!-- DECISION FLOWCHART -->
+  <div class="section" style="padding-top:0">
+    <div class="section-title"><span class="dot"></span> How to Choose an Algorithm</div>
+    <div class="flowchart-wrap">
+      <div class="flowchart-toolbar">
+        <button class="tb-btn" onclick="zoomFlow(1.2)">＋ Zoom in</button>
+        <button class="tb-btn" onclick="zoomFlow(0.8)">－ Zoom out</button>
+        <button class="tb-btn" onclick="zoomFlow('reset')">Reset</button>
+        <span style="margin-left:auto;font-size:12px;color:var(--dim)">Scroll / drag to explore</span>
+      </div>
+      <div class="flowchart-canvas" id="flow-canvas">
+        <div class="flowchart-inner" id="flow-inner">
+<svg id="flow-svg" viewBox="0 0 760 620" xmlns="http://www.w3.org/2000/svg" font-family="Inter,sans-serif">
+  <defs>
+    <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#4a5070"/>
+    </marker>
+    <marker id="arr-b" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#4f8ef7"/>
+    </marker>
+    <marker id="arr-g" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#2dd4bf"/>
+    </marker>
+    <marker id="arr-p" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L8,3 z" fill="#a78bfa"/>
+    </marker>
+  </defs>
+  <!-- Start -->
+  <rect x="300" y="16" width="160" height="38" rx="19" fill="#1e3a6e" stroke="#4f8ef7" stroke-width="1.5"/>
+  <text x="380" y="40" text-anchor="middle" fill="#4f8ef7" font-size="13" font-weight="600">Start</text>
+  <!-- Arrow down -->
+  <line x1="380" y1="54" x2="380" y2="78" stroke="#4a5070" stroke-width="1.5" marker-end="url(#arr)"/>
+  <!-- Q1: Labeled data? -->
+  <rect x="270" y="80" width="220" height="44" rx="8" fill="#1a1e2a" stroke="#353c55" stroke-width="1.5"/>
+  <text x="380" y="100" text-anchor="middle" fill="#e8eaf0" font-size="13" font-weight="500">Do you have labeled data?</text>
+  <text x="380" y="116" text-anchor="middle" fill="#7a82a0" font-size="11">(training examples with known outputs)</text>
+  <!-- YES left -->
+  <line x1="270" y1="102" x2="170" y2="102" stroke="#4f8ef7" stroke-width="1.5" marker-end="url(#arr-b)"/>
+  <text x="218" y="96" text-anchor="middle" fill="#4f8ef7" font-size="11" font-weight="600">YES</text>
+  <!-- NO right -->
+  <line x1="490" y1="102" x2="590" y2="102" stroke="#2dd4bf" stroke-width="1.5" marker-end="url(#arr-g)"/>
+  <text x="542" y="96" text-anchor="middle" fill="#2dd4bf" font-size="11" font-weight="600">NO</text>
+
+  <!-- SUPERVISED box -->
+  <rect x="60" y="80" width="110" height="44" rx="8" fill="#1e3a6e" stroke="#4f8ef7" stroke-width="1.5"/>
+  <text x="115" y="100" text-anchor="middle" fill="#4f8ef7" font-size="12" font-weight="600">Supervised</text>
+  <text x="115" y="116" text-anchor="middle" fill="#7ab0f7" font-size="10">Learning</text>
+  <!-- UNSUPERVISED box -->
+  <rect x="590" y="80" width="130" height="44" rx="8" fill="#0d3d38" stroke="#2dd4bf" stroke-width="1.5"/>
+  <text x="655" y="100" text-anchor="middle" fill="#2dd4bf" font-size="12" font-weight="600">Unsupervised</text>
+  <text x="655" y="116" text-anchor="middle" fill="#5de8d4" font-size="10">Learning</text>
+
+  <!-- Arrow down from supervised -->
+  <line x1="115" y1="124" x2="115" y2="164" stroke="#4f8ef7" stroke-width="1.5" marker-end="url(#arr-b)"/>
+  <!-- Q2: Type? -->
+  <rect x="30" y="166" width="170" height="40" rx="8" fill="#1a1e2a" stroke="#353c55" stroke-width="1.5"/>
+  <text x="115" y="183" text-anchor="middle" fill="#e8eaf0" font-size="12" font-weight="500">Predict a category</text>
+  <text x="115" y="198" text-anchor="middle" fill="#7a82a0" font-size="11">or a number?</text>
+
+  <!-- Classification left -->
+  <line x1="30" y1="186" x2="-10" y2="186" stroke="#4a5070" stroke-width="1.5"/>
+  <line x1="-10" y1="186" x2="-10" y2="270" stroke="#4a5070" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="-6" y="228" fill="#7a82a0" font-size="10">Category</text>
+  <!-- Regression right -->
+  <line x1="200" y1="186" x2="240" y2="186" stroke="#4a5070" stroke-width="1.5"/>
+  <line x1="240" y1="186" x2="240" y2="270" stroke="#4a5070" stroke-width="1.5" marker-end="url(#arr)"/>
+  <text x="208" y="228" fill="#7a82a0" font-size="10">Number</text>
+
+  <!-- Classification box -->
+  <rect x="-30" y="270" width="130" height="90" rx="8" fill="#2d1f6e" stroke="#a78bfa" stroke-width="1.5"/>
+  <text x="35" y="288" text-anchor="middle" fill="#a78bfa" font-size="11" font-weight="600">Classification</text>
+  <text x="35" y="305" text-anchor="middle" fill="#c4b5fd" font-size="10">• Logistic Regression</text>
+  <text x="35" y="320" text-anchor="middle" fill="#c4b5fd" font-size="10">• SVM</text>
+  <text x="35" y="335" text-anchor="middle" fill="#c4b5fd" font-size="10">• Random Forest</text>
+  <text x="35" y="350" text-anchor="middle" fill="#c4b5fd" font-size="10">• XGBoost / KNN</text>
+
+  <!-- Regression box -->
+  <rect x="175" y="270" width="130" height="90" rx="8" fill="#1e3a6e" stroke="#4f8ef7" stroke-width="1.5"/>
+  <text x="240" y="288" text-anchor="middle" fill="#4f8ef7" font-size="11" font-weight="600">Regression</text>
+  <text x="240" y="305" text-anchor="middle" fill="#7ab0f7" font-size="10">• Linear Regression</text>
+  <text x="240" y="320" text-anchor="middle" fill="#7ab0f7" font-size="10">• Decision Tree</text>
+  <text x="240" y="335" text-anchor="middle" fill="#7ab0f7" font-size="10">• SVR</text>
+  <text x="240" y="350" text-anchor="middle" fill="#7ab0f7" font-size="10">• Random Forest</text>
+
+  <!-- From supervised → data size -->
+  <line x1="115" y1="206" x2="115" y2="240" stroke="#4a5070" stroke-width="1.3"/>
+  <!-- Data size diamond -->
+  <polygon points="115,240 155,270 115,300 75,270" fill="#1a1e2a" stroke="#353c55" stroke-width="1.5"/>
+  <text x="115" y="267" text-anchor="middle" fill="#e8eaf0" font-size="10">Data</text>
+  <text x="115" y="280" text-anchor="middle" fill="#e8eaf0" font-size="10">size?</text>
+
+  <!-- Skip this for clarity — simplify flow to Q1→supervised/unsupervised then branch below -->
+
+  <!-- Unsupervised options -->
+  <line x1="655" y1="124" x2="655" y2="164" stroke="#2dd4bf" stroke-width="1.5" marker-end="url(#arr-g)"/>
+  <rect x="575" y="166" width="160" height="110" rx="8" fill="#0d3d38" stroke="#2dd4bf" stroke-width="1.5"/>
+  <text x="655" y="186" text-anchor="middle" fill="#2dd4bf" font-size="11" font-weight="600">Unsupervised Options</text>
+  <text x="655" y="204" text-anchor="middle" fill="#5de8d4" font-size="10">Clustering → K-Means, DBSCAN</text>
+  <text x="655" y="220" text-anchor="middle" fill="#5de8d4" font-size="10">Dim. reduction → PCA, t-SNE</text>
+  <text x="655" y="236" text-anchor="middle" fill="#5de8d4" font-size="10">Density → Gaussian Mixture</text>
+  <text x="655" y="252" text-anchor="middle" fill="#5de8d4" font-size="10">Association → Apriori</text>
+  <text x="655" y="268" text-anchor="middle" fill="#5de8d4" font-size="10">Anomaly → Isolation Forest</text>
+
+  <!-- INTERPRETABILITY branch from supervised -->
+  <line x1="200" y1="186" x2="380" y2="186" stroke="#4a5070" stroke-width="1" stroke-dasharray="4,3"/>
+  <line x1="380" y1="186" x2="380" y2="360" stroke="#4a5070" stroke-width="1.3" marker-end="url(#arr)"/>
+  <!-- Q: interpretability -->
+  <rect x="295" y="360" width="170" height="40" rx="8" fill="#1a1e2a" stroke="#353c55" stroke-width="1.5"/>
+  <text x="380" y="377" text-anchor="middle" fill="#e8eaf0" font-size="12">Need interpretability?</text>
+  <text x="380" y="392" text-anchor="middle" fill="#7a82a0" font-size="10">(explainable vs black-box)</text>
+  <!-- YES interpretable -->
+  <line x1="295" y1="380" x2="240" y2="380" stroke="#4a5070" stroke-width="1.3"/>
+  <line x1="240" y1="380" x2="240" y2="430" stroke="#4a5070" stroke-width="1.3" marker-end="url(#arr)"/>
+  <text x="260" y="408" fill="#7a82a0" font-size="10">Yes</text>
+  <rect x="170" y="430" width="140" height="76" rx="8" fill="#0d3320" stroke="#4ade80" stroke-width="1.5"/>
+  <text x="240" y="450" text-anchor="middle" fill="#4ade80" font-size="11" font-weight="600">Interpretable</text>
+  <text x="240" y="467" text-anchor="middle" fill="#a0e8b8" font-size="10">• Linear Regression</text>
+  <text x="240" y="482" text-anchor="middle" fill="#a0e8b8" font-size="10">• Logistic Regression</text>
+  <text x="240" y="497" text-anchor="middle" fill="#a0e8b8" font-size="10">• Decision Tree</text>
+  <!-- NO black box -->
+  <line x1="465" y1="380" x2="520" y2="380" stroke="#4a5070" stroke-width="1.3"/>
+  <line x1="520" y1="380" x2="520" y2="430" stroke="#4a5070" stroke-width="1.3" marker-end="url(#arr)"/>
+  <text x="486" y="408" fill="#7a82a0" font-size="10">No</text>
+  <rect x="450" y="430" width="140" height="76" rx="8" fill="#3d1230" stroke="#f472b6" stroke-width="1.5"/>
+  <text x="520" y="450" text-anchor="middle" fill="#f472b6" font-size="11" font-weight="600">High Accuracy</text>
+  <text x="520" y="467" text-anchor="middle" fill="#f4a0c8" font-size="10">• Random Forest</text>
+  <text x="520" y="482" text-anchor="middle" fill="#f4a0c8" font-size="10">• XGBoost ⭐</text>
+  <text x="520" y="497" text-anchor="middle" fill="#f4a0c8" font-size="10">• SVM / Neural Net</text>
+
+  <!-- Speed branch -->
+  <line x1="380" y1="400" x2="380" y2="530" stroke="#fbbf24" stroke-width="1.3" marker-end="url(#arr)"/>
+  <rect x="310" y="532" width="140" height="58" rx="8" fill="#3d2a00" stroke="#fbbf24" stroke-width="1.5"/>
+  <text x="380" y="552" text-anchor="middle" fill="#fbbf24" font-size="11" font-weight="600">Need speed?</text>
+  <text x="380" y="568" text-anchor="middle" fill="#f0d090" font-size="10">• Naive Bayes</text>
+  <text x="380" y="582" text-anchor="middle" fill="#f0d090" font-size="10">• Logistic Regression</text>
+</svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUPERVISED TAB -->
+<div id="tab-supervised" class="hidden">
+  <div class="section">
+    <div class="section-title"><span class="dot"></span> Supervised Learning Algorithms</div>
+    <div class="algo-grid" id="algo-grid-supervised"></div>
+  </div>
+</div>
+
+<!-- UNSUPERVISED TAB -->
+<div id="tab-unsupervised" class="hidden">
+  <div class="section">
+    <div class="section-title"><span class="dot"></span> Unsupervised Learning Algorithms</div>
+    <div class="algo-grid" id="algo-grid-unsupervised"></div>
+  </div>
+</div>
+
+<!-- COMPARE TAB -->
+<div id="tab-compare" class="hidden">
+  <div class="section">
+    <div class="section-title"><span class="dot"></span> Algorithm Comparison</div>
+    <div class="table-wrap">
+      <table id="compare-table">
+        <thead>
+          <tr>
+            <th>Algorithm</th>
+            <th>Type</th>
+            <th>Train Speed</th>
+            <th>Predict Speed</th>
+            <th>Interpretable</th>
+            <th>High-dim</th>
+            <th>Small data</th>
+            <th>Best for</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ALGORITHM CARDS (shown in overview too) -->
+<div id="overview-algos" class="section" style="padding-top:0">
+  <div class="section-title"><span class="dot"></span> All Algorithms</div>
+  <div class="algo-grid" id="algo-grid-all"></div>
+</div>
+
+<footer>ML.ref — Interactive Machine Learning Reference &nbsp;·&nbsp; Built with HTML + Canvas + SVG &nbsp;·&nbsp; Open source on GitHub</footer>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const algos = [
+  {
+    id:'linear-reg',
+    name:'Linear Regression',
+    type:'supervised',
+    subtype:'regression',
+    icon:'📈',
+    color:'#1e3a6e',
+    accent:'#4f8ef7',
+    tagColor:'#4f8ef7',
+    tags:['regression','interpretable','fast'],
+    desc:'Fits a straight line (or hyperplane) through data to predict a continuous output by minimizing squared error.',
+    formula:'ŷ = w₀ + w₁x₁ + … + wₙxₙ',
+    when:'Predicting house prices, sales forecasting, or any linear relationship between features and a continuous target.',
+    pros:['Very fast to train and predict','Highly interpretable coefficients','Low memory footprint','Works well with small datasets'],
+    cons:['Assumes linear relationship','Sensitive to outliers','Poor with complex non-linear patterns'],
+    code:`from sklearn.linear_model import LinearRegression\nimport numpy as np\n\nX = np.array([[1],[2],[3],[4],[5]])\ny = np.array([2.2, 4.1, 5.9, 8.0, 10.1])\n\nmodel = LinearRegression()\nmodel.fit(X, y)\nprint(model.coef_, model.intercept_)`,
+    viz:'linear',
+    compare:{trainSpeed:'fast',predictSpeed:'fast',interp:'✅',highDim:'⚠️',smallData:'✅',bestFor:'Continuous output'}
+  },
+  {
+    id:'logistic-reg',
+    name:'Logistic Regression',
+    type:'supervised',
+    subtype:'classification',
+    icon:'🔀',
+    color:'#2d1f6e',
+    accent:'#a78bfa',
+    tagColor:'#a78bfa',
+    tags:['classification','interpretable','fast','probabilistic'],
+    desc:'Despite the name, it\'s a classification algorithm. Uses a sigmoid function to output class probabilities.',
+    formula:'P(y=1) = σ(w·x + b) = 1 / (1 + e^(−z))',
+    when:'Binary or multi-class classification where you need probability outputs and interpretability (spam detection, medical diagnosis baseline).',
+    pros:['Outputs calibrated probabilities','Fast training','Interpretable coefficients','Regularization options (L1/L2)'],
+    cons:['Assumes linear decision boundary','May underfit complex data','Needs feature scaling'],
+    code:`from sklearn.linear_model import LogisticRegression\nfrom sklearn.datasets import make_classification\n\nX, y = make_classification(n_samples=500, random_state=42)\nmodel = LogisticRegression(max_iter=1000)\nmodel.fit(X, y)\nprint(model.score(X, y))`,
+    viz:'logistic',
+    compare:{trainSpeed:'fast',predictSpeed:'fast',interp:'✅',highDim:'⚠️',smallData:'✅',bestFor:'Binary / multi-class'}
+  },
+  {
+    id:'svm',
+    name:'Support Vector Machine',
+    type:'supervised',
+    subtype:'classification',
+    icon:'✂️',
+    color:'#1a0d3a',
+    accent:'#c084fc',
+    tagColor:'#c084fc',
+    tags:['classification','regression','kernel trick','robust'],
+    desc:'Finds the maximum-margin hyperplane separating classes. Kernel trick projects data into higher dimensions for non-linear boundaries.',
+    formula:'max margin = 2 / ‖w‖  subject to yᵢ(w·xᵢ + b) ≥ 1',
+    when:'High-dimensional text classification, image recognition, small-to-medium datasets with clear margin separation.',
+    pros:['Effective in high-dimensional spaces','Memory efficient (support vectors only)','Versatile with different kernels','Robust to outliers'],
+    cons:['Slow on large datasets','Kernel/C parameter tuning required','Not probabilistic by default'],
+    code:`from sklearn.svm import SVC\nfrom sklearn.preprocessing import StandardScaler\nfrom sklearn.pipeline import Pipeline\n\nmodel = Pipeline([\n  ('scaler', StandardScaler()),\n  ('svc', SVC(kernel='rbf', C=1.0, probability=True))\n])\nmodel.fit(X_train, y_train)`,
+    viz:'svm',
+    compare:{trainSpeed:'slow',predictSpeed:'mid',interp:'❌',highDim:'✅',smallData:'✅',bestFor:'High-dim classification'}
+  },
+  {
+    id:'knn',
+    name:'K-Nearest Neighbors',
+    type:'supervised',
+    subtype:'classification',
+    icon:'🔵',
+    color:'#0d3d38',
+    accent:'#2dd4bf',
+    tagColor:'#2dd4bf',
+    tags:['classification','regression','non-parametric','lazy'],
+    desc:'Classifies a new point by majority vote of its k nearest neighbors in feature space. No explicit training phase.',
+    formula:'ŷ = mode { y(x₁), y(x₂), …, y(xₖ) }  for k nearest xᵢ',
+    when:'Small datasets, recommendation systems, anomaly detection. Simple baseline for classification.',
+    pros:['No training time (lazy learner)','Naturally handles multi-class','Adapts to any decision boundary','Intuitive to explain'],
+    cons:['Slow prediction on large datasets','Sensitive to irrelevant features','Requires feature scaling','High memory usage'],
+    code:`from sklearn.neighbors import KNeighborsClassifier\nfrom sklearn.preprocessing import StandardScaler\n\nscaler = StandardScaler()\nX_scaled = scaler.fit_transform(X_train)\n\nmodel = KNeighborsClassifier(n_neighbors=5, metric='euclidean')\nmodel.fit(X_scaled, y_train)`,
+    viz:'knn',
+    compare:{trainSpeed:'none',predictSpeed:'slow',interp:'⚠️',highDim:'❌',smallData:'✅',bestFor:'Simple classification'}
+  },
+  {
+    id:'decision-tree',
+    name:'Decision Tree',
+    type:'supervised',
+    subtype:'classification',
+    icon:'🌳',
+    color:'#0d3320',
+    accent:'#4ade80',
+    tagColor:'#4ade80',
+    tags:['classification','regression','interpretable','no-scaling'],
+    desc:'Recursively splits data on features that maximize information gain (or Gini impurity reduction) to build a tree of decisions.',
+    formula:'Gini = 1 − Σ pᵢ²  |  Entropy = −Σ pᵢ log₂(pᵢ)',
+    when:'When you need interpretable rules. Feature selection, medical diagnosis, customer segmentation with explainability requirements.',
+    pros:['Extremely interpretable (visualize rules)','No feature scaling needed','Handles mixed feature types','Fast prediction'],
+    cons:['Prone to overfitting without pruning','High variance (small data change = different tree)','Biased toward features with more levels'],
+    code:`from sklearn.tree import DecisionTreeClassifier, export_text\n\nmodel = DecisionTreeClassifier(\n  max_depth=5, min_samples_leaf=10, random_state=42\n)\nmodel.fit(X_train, y_train)\nprint(export_text(model, feature_names=feature_names))`,
+    viz:'tree',
+    compare:{trainSpeed:'fast',predictSpeed:'fast',interp:'✅',highDim:'⚠️',smallData:'✅',bestFor:'Interpretable rules'}
+  },
+  {
+    id:'random-forest',
+    name:'Random Forest',
+    type:'supervised',
+    subtype:'ensemble',
+    icon:'🌲',
+    color:'#0d3320',
+    accent:'#22c55e',
+    tagColor:'#22c55e',
+    tags:['ensemble','classification','regression','robust'],
+    desc:'Trains hundreds of decision trees on random subsets of data and features, then aggregates their predictions (bagging).',
+    formula:'ŷ = majority_vote( tree₁(x), tree₂(x), …, treeₙ(x) )',
+    when:'Tabular data, general-purpose classification/regression, feature importance ranking. A strong baseline for most problems.',
+    pros:['Robust to overfitting','Built-in feature importance','Handles missing values','Parallelizable'],
+    cons:['Black box (hard to interpret)','High memory usage','Slower than single tree','Overkill for very simple problems'],
+    code:`from sklearn.ensemble import RandomForestClassifier\nimport pandas as pd\n\nmodel = RandomForestClassifier(\n  n_estimators=200, max_features='sqrt',\n  min_samples_leaf=5, n_jobs=-1, random_state=42\n)\nmodel.fit(X_train, y_train)\n\n# Feature importance\nfeat_imp = pd.Series(model.feature_importances_, index=feature_names)\nprint(feat_imp.sort_values(ascending=False).head(10))`,
+    viz:'forest',
+    compare:{trainSpeed:'mid',predictSpeed:'mid',interp:'❌',highDim:'✅',smallData:'⚠️',bestFor:'General tabular data'}
+  },
+  {
+    id:'xgboost',
+    name:'XGBoost',
+    type:'supervised',
+    subtype:'ensemble',
+    icon:'⚡',
+    color:'#3d2a00',
+    accent:'#fbbf24',
+    tagColor:'#fbbf24',
+    tags:['ensemble','boosting','classification','regression','top performance'],
+    desc:'Gradient boosting that builds trees sequentially, each correcting the errors of the previous. Highly optimized with regularization.',
+    formula:'F(x) = Σₘ γₘhₘ(x)  where each hₘ fits residuals of Fₘ₋₁',
+    when:'Kaggle competitions, structured tabular data where you need maximum accuracy. Industry-standard for business ML problems.',
+    pros:['State-of-the-art accuracy on tabular data','Built-in regularization (L1/L2)','Handles missing values natively','Very fast with GPU support'],
+    cons:['Many hyperparameters to tune','Prone to overfitting without tuning','Memory intensive','Less intuitive than single trees'],
+    code:`import xgboost as xgb\nfrom sklearn.model_selection import cross_val_score\n\nmodel = xgb.XGBClassifier(\n  n_estimators=500, learning_rate=0.05,\n  max_depth=6, subsample=0.8,\n  colsample_bytree=0.8, eval_metric='logloss',\n  random_state=42, use_label_encoder=False\n)\nscores = cross_val_score(model, X, y, cv=5, scoring='roc_auc')\nprint(f'AUC: {scores.mean():.4f} ± {scores.std():.4f}')`,
+    viz:'boost',
+    compare:{trainSpeed:'mid',predictSpeed:'fast',interp:'❌',highDim:'✅',smallData:'⚠️',bestFor:'Max accuracy (tabular)'}
+  },
+  {
+    id:'naive-bayes',
+    name:'Naive Bayes',
+    type:'supervised',
+    subtype:'classification',
+    icon:'📊',
+    color:'#1a1e2a',
+    accent:'#60a5fa',
+    tagColor:'#60a5fa',
+    tags:['classification','probabilistic','fast','text'],
+    desc:'Applies Bayes\' theorem assuming all features are conditionally independent. Despite this naive assumption, works remarkably well for text.',
+    formula:'P(y|X) ∝ P(y) · Π P(xᵢ|y)',
+    when:'Text classification (spam, sentiment), real-time prediction, very small datasets, when you need extremely fast inference.',
+    pros:['Extremely fast training and prediction','Works well with small data','Naturally multi-class','Handles high-dimensional features'],
+    cons:['Strong independence assumption often violated','Zero-frequency problem (Laplace smoothing needed)','Poor probability estimates'],
+    code:`from sklearn.naive_bayes import MultinomialNB\nfrom sklearn.feature_extraction.text import TfidfVectorizer\nfrom sklearn.pipeline import Pipeline\n\npipeline = Pipeline([\n  ('tfidf', TfidfVectorizer(max_features=10000)),\n  ('clf', MultinomialNB(alpha=0.1))\n])\npipeline.fit(X_text_train, y_train)`,
+    viz:'bayes',
+    compare:{trainSpeed:'fast',predictSpeed:'fast',interp:'⚠️',highDim:'✅',smallData:'✅',bestFor:'Text / NLP tasks'}
+  },
+  {
+    id:'kmeans',
+    name:'K-Means Clustering',
+    type:'unsupervised',
+    subtype:'clustering',
+    icon:'🎯',
+    color:'#0d3d38',
+    accent:'#2dd4bf',
+    tagColor:'#2dd4bf',
+    tags:['clustering','unsupervised','scalable'],
+    desc:'Partitions data into K clusters by iteratively assigning each point to the nearest centroid, then recomputing centroids.',
+    formula:'minimize Σₖ Σ_{x∈Cₖ} ‖x − μₖ‖²',
+    when:'Customer segmentation, image compression, data exploration. When you need fast, simple grouping and know approximate K.',
+    pros:['Simple and fast','Scales to large datasets','Easy to interpret cluster centers','Guaranteed convergence'],
+    cons:['Must specify K in advance','Sensitive to initialization (use k-means++)','Assumes spherical clusters','Sensitive to outliers'],
+    code:`from sklearn.cluster import KMeans\nimport matplotlib.pyplot as plt\n\n# Elbow method to find K\ninertias = []\nfor k in range(1, 11):\n  km = KMeans(n_clusters=k, init='k-means++', random_state=42)\n  km.fit(X)\n  inertias.append(km.inertia_)\n\nmodel = KMeans(n_clusters=4, init='k-means++', n_init=10)\nlabels = model.fit_predict(X)`,
+    viz:'kmeans',
+    compare:{trainSpeed:'fast',predictSpeed:'fast',interp:'✅',highDim:'⚠️',smallData:'✅',bestFor:'Customer segmentation'}
+  },
+  {
+    id:'pca',
+    name:'PCA',
+    type:'unsupervised',
+    subtype:'dimensionality',
+    icon:'🔭',
+    color:'#1a0d3a',
+    accent:'#a78bfa',
+    tagColor:'#a78bfa',
+    tags:['dimensionality','unsupervised','preprocessing'],
+    desc:'Principal Component Analysis finds orthogonal directions (principal components) of maximum variance to reduce dimensionality.',
+    formula:'Z = X · W  where W = eigenvectors of Cov(X)',
+    when:'Visualizing high-dimensional data (2D/3D), removing multicollinearity before regression, compressing features before ML.',
+    pros:['Removes correlated features','Reduces noise','Enables 2D/3D visualization','No hyperparameters (just n_components)'],
+    cons:['Components are hard to interpret','Loses information (lossy compression)','Only captures linear relationships','Sensitive to feature scaling'],
+    code:`from sklearn.decomposition import PCA\nfrom sklearn.preprocessing import StandardScaler\n\nscaler = StandardScaler()\nX_scaled = scaler.fit_transform(X)\n\npca = PCA(n_components=0.95)  # keep 95% variance\nX_reduced = pca.fit_transform(X_scaled)\nprint(f'Reduced from {X.shape[1]} to {X_reduced.shape[1]} features')\nprint(pca.explained_variance_ratio_.cumsum())`,
+    viz:'pca',
+    compare:{trainSpeed:'fast',predictSpeed:'fast',interp:'❌',highDim:'✅',smallData:'✅',bestFor:'Dimensionality reduction'}
+  },
+  {
+    id:'dbscan',
+    name:'DBSCAN',
+    type:'unsupervised',
+    subtype:'clustering',
+    icon:'🌐',
+    color:'#0d3320',
+    accent:'#4ade80',
+    tagColor:'#4ade80',
+    tags:['clustering','unsupervised','anomaly','density'],
+    desc:'Density-Based Spatial Clustering. Groups together points that are closely packed, marking low-density points as outliers.',
+    formula:'Core point: |N_ε(p)| ≥ MinPts  |  Noise: not reachable from any core point',
+    when:'Geospatial clustering, anomaly detection, non-spherical clusters, when K is unknown.',
+    pros:['No need to specify K','Discovers arbitrary-shaped clusters','Robust to outliers (marks as noise)','No assumption about cluster shape'],
+    cons:['Sensitive to ε and MinPts','Struggles with varying densities','Not ideal for high-dimensional data'],
+    code:`from sklearn.cluster import DBSCAN\nfrom sklearn.preprocessing import StandardScaler\n\nX_scaled = StandardScaler().fit_transform(X)\n\nmodel = DBSCAN(eps=0.5, min_samples=5)\nlabels = model.fit_predict(X_scaled)\nn_clusters = len(set(labels)) - (1 if -1 in labels else 0)\nprint(f'Found {n_clusters} clusters, {(labels==-1).sum()} outliers')`,
+    viz:'dbscan',
+    compare:{trainSpeed:'mid',predictSpeed:'slow',interp:'⚠️',highDim:'❌',smallData:'✅',bestFor:'Anomaly detection'}
+  }
+];
+
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function makeCard(algo) {
+  return `
+  <div class="algo-card" id="card-${algo.id}" data-type="${algo.type}" data-subtype="${algo.subtype}" onclick="toggleCard('${algo.id}')">
+    <div class="algo-header">
+      <div class="algo-icon" style="background:${algo.color};font-size:18px">${algo.icon}</div>
+      <div class="algo-meta">
+        <div class="algo-name">${algo.name}</div>
+        <span class="algo-type" style="background:${algo.color};color:${algo.accent}">${algo.subtype}</span>
+      </div>
+    </div>
+    <div class="algo-desc">${algo.desc}</div>
+    <div class="algo-tags">${algo.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    <div class="algo-expand">
+      <div class="algo-body">
+        <h4>Formula / Core Idea</h4>
+        <div class="code-block" style="color:#fbbf24">${algo.formula}</div>
+        <h4>When to use</h4>
+        <p>${algo.when}</p>
+        <h4>Pros & Cons</h4>
+        <div class="pro-con">
+          <div class="pro-con-box pro"><strong>Pros</strong>${algo.pros.map(p=>`• ${p}`).join('<br>')}</div>
+          <div class="pro-con-box con"><strong>Cons</strong>${algo.cons.map(c=>`• ${c}`).join('<br>')}</div>
+        </div>
+        <h4>Visualization</h4>
+        <div class="viz-panel" id="viz-${algo.id}">
+          <canvas id="canvas-${algo.id}" width="440" height="160"></canvas>
+          <span class="viz-label">${algo.name}</span>
+        </div>
+        <h4>Python Code</h4>
+        <div class="code-block">${algo.code.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderGrids(){
+  const all = document.getElementById('algo-grid-all');
+  const sup = document.getElementById('algo-grid-supervised');
+  const uns = document.getElementById('algo-grid-unsupervised');
+  algos.forEach(a=>{
+    all.innerHTML += makeCard(a);
+    if(a.type==='supervised') sup.innerHTML += makeCard(a);
+    else uns.innerHTML += makeCard(a);
+  });
+  renderCompareTable();
+}
+
+function renderCompareTable(){
+  const tbody = document.querySelector('#compare-table tbody');
+  const speedBadge = s => s==='fast'?'<span class="badge good">Fast</span>':s==='mid'?'<span class="badge mid">Mid</span>':s==='slow'?'<span class="badge bad">Slow</span>':'<span class="badge">—</span>';
+  algos.forEach(a=>{
+    const c = a.compare;
+    tbody.innerHTML += `<tr>
+      <td><strong>${a.icon} ${a.name}</strong></td>
+      <td><span style="color:${a.accent}">${a.subtype}</span></td>
+      <td>${speedBadge(c.trainSpeed)}</td>
+      <td>${speedBadge(c.predictSpeed)}</td>
+      <td>${c.interp}</td>
+      <td>${c.highDim}</td>
+      <td>${c.smallData}</td>
+      <td style="color:var(--muted);font-size:12px">${c.bestFor}</td>
+    </tr>`;
+  });
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function showTab(id){
+  ['overview','supervised','unsupervised','compare'].forEach(t=>{
+    document.getElementById(`tab-${t}`).classList.toggle('hidden',t!==id);
+  });
+  document.getElementById('overview-algos').classList.toggle('hidden',id!=='overview');
+  document.querySelectorAll('.nav-tab').forEach((el,i)=>{
+    el.classList.toggle('active',['overview','supervised','unsupervised','compare'][i]===id);
+  });
+}
+
+// ── CARD TOGGLE ───────────────────────────────────────────────────────────────
+function toggleCard(id){
+  const cards = document.querySelectorAll(`#card-${id}`);
+  cards.forEach(card=>{
+    const wasOpen = card.classList.contains('open');
+    card.classList.toggle('open');
+    if(!wasOpen) setTimeout(()=>drawViz(id), 50);
+  });
+}
+
+// ── FILTER ────────────────────────────────────────────────────────────────────
+function filterType(type, el){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('.algo-card').forEach(card=>{
+    const match = type==='all' || card.dataset.subtype===type || card.dataset.type===type;
+    card.style.display = match ? '' : 'none';
+  });
+}
+
+function filterAlgos(q){
+  q = q.toLowerCase();
+  document.querySelectorAll('.algo-card').forEach(card=>{
+    const text = card.textContent.toLowerCase();
+    card.style.display = text.includes(q) ? '' : 'none';
+  });
+}
+
+// ── ZOOM FLOWCHART ────────────────────────────────────────────────────────────
+let flowScale = 1;
+function zoomFlow(factor){
+  if(factor==='reset'){flowScale=1;}
+  else flowScale = Math.min(2.5, Math.max(0.4, flowScale*factor));
+  document.getElementById('flow-inner').style.transform = `scale(${flowScale})`;
+  document.getElementById('flow-inner').style.transformOrigin = 'top center';
+}
+
+// Drag to pan
+const fc = document.getElementById ? null : null;
+window.addEventListener('load',()=>{
+  const canvas = document.getElementById('flow-canvas');
+  if(!canvas) return;
+  let dragging=false,sx=0,sy=0,sl=0,st=0;
+  canvas.addEventListener('mousedown',e=>{dragging=true;sx=e.clientX;sy=e.clientY;sl=canvas.scrollLeft;st=canvas.scrollTop});
+  canvas.addEventListener('mousemove',e=>{if(!dragging)return;canvas.scrollLeft=sl-(e.clientX-sx);canvas.scrollTop=st-(e.clientY-sy)});
+  canvas.addEventListener('mouseup',()=>dragging=false);
+  canvas.addEventListener('mouseleave',()=>dragging=false);
+});
+
+// ── CANVAS VISUALIZATIONS ─────────────────────────────────────────────────────
+function drawViz(id){
+  const cvs = document.getElementById(`canvas-${id}`);
+  if(!cvs) return;
+  const ctx = cvs.getContext('2d');
+  ctx.clearRect(0,0,cvs.width,cvs.height);
+  const w=cvs.width, h=cvs.height;
+  const isDark = document.documentElement.classList.contains('dark');
+  const bg= isDark ? '#0d0f14' : '#f0f2f8';
+  const textColor = isDark ? '#7a82a0' : '#5a6080';
+  ctx.fillStyle=bg; ctx.fillRect(0,0,w,h);
+
+  const algo = algos.find(a=>a.id===id);
+  const accent = algo ? algo.accent : '#4f8ef7';
+
+  if(id==='linear-reg'||id==='linear'){
+    // Scatter + line
+    const pts=[];
+    for(let i=0;i<35;i++){const x=20+Math.random()*400;pts.push({x,y:0.4*x+40+(-50+Math.random()*100)});}
+    pts.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fillStyle='#4f8ef780';ctx.fill();});
+    ctx.beginPath();ctx.moveTo(20,48);ctx.lineTo(420,208);
+    ctx.strokeStyle=accent;ctx.lineWidth=2;ctx.stroke();
+    ctx.fillStyle=accent;ctx.font='11px Inter';ctx.fillText('ŷ = 0.4x + 40',290,130);
+  }
+  else if(id==='logistic-reg'||id==='logistic'){
+    // Sigmoid curve
+    ctx.beginPath();
+    for(let x=0;x<w;x++){const z=(x-w/2)/30;const y=h-h/(1+Math.exp(-z));if(x===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
+    ctx.strokeStyle=accent;ctx.lineWidth=2.5;ctx.stroke();
+    ctx.strokeStyle=isDark?'#353c55':'#c8cde0';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(0,h/2);ctx.lineTo(w,h/2);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=accent;ctx.font='11px Inter';ctx.fillText('σ(z) = 1/(1+e⁻ᶻ)',10,20);
+    for(let i=0;i<20;i++){const px=50+Math.random()*140;ctx.beginPath();ctx.arc(px,h-20-Math.random()*30,4,0,Math.PI*2);ctx.fillStyle='#4f8ef780';ctx.fill();}
+    for(let i=0;i<20;i++){const px=250+Math.random()*140;ctx.beginPath();ctx.arc(px,20+Math.random()*30,4,0,Math.PI*2);ctx.fillStyle='#f472b680';ctx.fill();}
+  }
+  else if(id==='svm'){
+    // Two clusters + margin hyperplane
+    const c1=Array.from({length:20},()=>({x:80+Math.random()*120,y:30+Math.random()*100}));
+    const c2=Array.from({length:20},()=>({x:240+Math.random()*120,y:50+Math.random()*100}));
+    c1.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,5,0,Math.PI*2);ctx.fillStyle='#4f8ef770';ctx.fill();});
+    c2.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,5,0,Math.PI*2);ctx.fillStyle='#f472b670';ctx.fill();});
+    // Decision boundary
+    ctx.beginPath();ctx.moveTo(210,10);ctx.lineTo(210,150);ctx.strokeStyle=accent;ctx.lineWidth=2;ctx.stroke();
+    // Margins
+    ctx.setLineDash([5,5]);ctx.strokeStyle=isDark?'#ffffff30':'#00000020';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(185,10);ctx.lineTo(185,150);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(235,10);ctx.lineTo(235,150);ctx.stroke();
+    ctx.setLineDash([]);
+    // Support vectors
+    [c1[c1.length-1],c2[0]].forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,7,0,Math.PI*2);ctx.strokeStyle=accent;ctx.lineWidth=1.5;ctx.stroke();});
+    ctx.fillStyle=accent;ctx.font='10px Inter';ctx.fillText('Maximum margin',215,80);
+  }
+  else if(id==='knn'){
+    const colors=['#4f8ef7','#f472b6','#4ade80'];
+    const clusters=[[{x:80,y:60},{x:100,y:80},{x:70,y:90},{x:90,y:50}],[{x:250,y:40},{x:270,y:70},{x:240,y:55}],[{x:160,y:120},{x:180,y:140},{x:150,y:130}]];
+    clusters.forEach((cl,ci)=>cl.forEach(p=>{ctx.beginPath();ctx.arc(p.x,p.y,6,0,Math.PI*2);ctx.fillStyle=colors[ci]+'99';ctx.fill();}));
+    // Query point
+    const qx=160,qy=70;
+    ctx.beginPath();ctx.arc(qx,qy,8,0,Math.PI*2);ctx.fillStyle='#fbbf24';ctx.fill();
+    ctx.strokeStyle='#fbbf24';ctx.lineWidth=1.5;
+    // Draw lines to 3 nearest
+    [[80,60],[100,80],[160,120]].forEach(([nx,ny])=>{ctx.beginPath();ctx.moveTo(qx,qy);ctx.lineTo(nx,ny);ctx.setLineDash([3,3]);ctx.stroke();});
+    ctx.setLineDash([]);
+    ctx.fillStyle='#fbbf24';ctx.font='10px Inter';ctx.fillText('Query point (K=3)',qx+10,qy-10);
+  }
+  else if(id==='kmeans'){
+    const centers=[{x:100,y:70,c:'#4f8ef7'},{x:280,y:60,c:'#f472b6'},{x:190,y:130,c:'#4ade80'}];
+    centers.forEach(ctr=>{
+      for(let i=0;i<14;i++){ctx.beginPath();ctx.arc(ctr.x+(-30+Math.random()*60),ctr.y+(-25+Math.random()*50),5,0,Math.PI*2);ctx.fillStyle=ctr.c+'60';ctx.fill();}
+      ctx.beginPath();ctx.arc(ctr.x,ctr.y,9,0,Math.PI*2);ctx.fillStyle=ctr.c;ctx.fill();
+      ctx.beginPath();ctx.arc(ctr.x,ctr.y,9,0,Math.PI*2);ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();
+    });
+    ctx.fillStyle=textColor;ctx.font='10px Inter';ctx.fillText('● centroids',10,150);
+  }
+  else if(id==='decision-tree'||id==='tree'){
+    const nodeTextColor=isDark?'#e8eaf0':'#1a1d2e';
+    const lineColor=isDark?'#353c55':'#c8cde0';
+    function node(x,y,label,color='#1e3a6e',stroke='#4f8ef7'){ctx.beginPath();ctx.roundRect(x-35,y-14,70,28,5);ctx.fillStyle=color;ctx.fill();ctx.strokeStyle=stroke;ctx.lineWidth=1.2;ctx.stroke();ctx.fillStyle=nodeTextColor;ctx.font='10px Inter';ctx.textAlign='center';ctx.fillText(label,x,y+4);}
+    function line(x1,y1,x2,y2){ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle=lineColor;ctx.lineWidth=1;ctx.stroke();}
+    ctx.textAlign='left';
+    node(220,22,'Age > 30?');
+    line(185,36,130,62);line(255,36,310,62);
+    node(130,76,'Income > 50k?',isDark?'#1a1e2a':'#f0f2f8',isDark?'#7a82a0':'#9aa0bc');
+    node(310,76,'Buy?','#0d3320','#4ade80');
+    line(100,90,70,116);line(160,90,190,116);
+    ctx.fillStyle='#4ade80';ctx.font='11px Inter';ctx.textAlign='center';
+    node(70,130,'Yes','#0d3320','#4ade80');node(190,130,'No','#3d1230','#f472b6');node(310,90,'Yes','#0d3320','#4ade80');
+    ctx.textAlign='left';
+  }
+  else if(id==='random-forest'||id==='forest'){
+    [60,180,300,380].forEach((x,i)=>{
+      const h2=40+i*15;
+      ctx.fillStyle='#0d3320';ctx.strokeStyle='#22c55e50';ctx.lineWidth=1;
+      ctx.beginPath();ctx.roundRect(x-25,10,50,h2,4);ctx.fill();ctx.stroke();
+      ctx.fillStyle='#22c55e80';ctx.font='9px Inter';ctx.textAlign='center';ctx.fillText(`Tree ${i+1}`,x,h2+20);
+    });
+    ctx.beginPath();ctx.roundRect(160,120,120,28,6);ctx.fillStyle='#fbbf2420';ctx.fill();ctx.strokeStyle='#fbbf24';ctx.lineWidth=1.5;ctx.stroke();
+    ctx.fillStyle='#fbbf24';ctx.font='11px Inter';ctx.textAlign='center';ctx.fillText('Majority Vote',220,139);
+    ctx.textAlign='left';
+  }
+  else if(id==='xgboost'||id==='boost'){
+    const residuals=[80,55,35,22,14,9,5];
+    ctx.fillStyle=textColor;ctx.font='10px Inter';ctx.fillText('Residual error per boosting round',10,14);
+    residuals.forEach((r,i)=>{
+      const bx=40+i*54,by=150-r,bh=r;
+      ctx.fillStyle=`rgba(251,191,36,${0.4+i*0.08})`;
+      ctx.beginPath();ctx.roundRect(bx,by,40,bh,3);ctx.fill();
+      ctx.fillStyle=textColor;ctx.font='9px Inter';ctx.textAlign='center';
+      ctx.fillText(`T${i+1}`,bx+20,165);ctx.fillText(r,bx+20,by-4);
+    });
+    ctx.beginPath();ctx.moveTo(40,150-80);residuals.forEach((r,i)=>ctx.lineTo(40+i*54+20,150-r));
+    ctx.strokeStyle=accent;ctx.lineWidth=2;ctx.stroke();
+    ctx.textAlign='left';
+  }
+  else if(id==='naive-bayes'||id==='bayes'){
+    ['P(spam|word)', 'P(ham|word)'].forEach((label,li)=>{
+      const bars=[0.85,0.62,0.91,0.44,0.78,0.55,0.9];
+      const colors=['#f472b6','#4f8ef7'];
+      bars.forEach((v,i)=>{
+        ctx.fillStyle=colors[li]+'60';
+        ctx.beginPath();ctx.roundRect(20+i*58+li*24,150-v*80,20,v*80,3);ctx.fill();
+      });
+    });
+    ctx.fillStyle='#f472b6';ctx.font='10px Inter';ctx.fillText('■ spam',300,20);
+    ctx.fillStyle='#4f8ef7';ctx.fillText('■ ham',300,35);
+    ctx.fillStyle=textColor;ctx.fillText('word features →',10,14);
+  }
+  else if(id==='pca'){
+    const variances=[0.42,0.28,0.12,0.08,0.05,0.03,0.02];
+    let cum=0;
+    variances.forEach((v,i)=>{
+      ctx.fillStyle=accent+'80';
+      ctx.beginPath();ctx.roundRect(30+i*58,150-v*200,44,v*200,3);ctx.fill();
+      cum+=v;
+      ctx.fillStyle=accent;ctx.font='9px Inter';ctx.textAlign='center';
+      ctx.fillText(`PC${i+1}`,52+i*58,165);
+      ctx.fillText(`${Math.round(cum*100)}%`,52+i*58,140-v*200);
+    });
+    ctx.fillStyle=textColor;ctx.textAlign='left';ctx.fillText('Cumulative variance explained',10,14);
+  }
+  else if(id==='dbscan'){
+    const noiseColor=isDark?'#ffffff20':'#00000015';
+    const noiseStroke=isDark?'#ffffff40':'#00000030';
+    const clust1=Array.from({length:18},()=>({x:80+Math.random()*80,y:50+Math.random()*70,noise:false}));
+    const clust2=Array.from({length:18},()=>({x:250+Math.random()*100,y:60+Math.random()*70,noise:false}));
+    const noise=Array.from({length:8},()=>({x:20+Math.random()*380,y:10+Math.random()*140,noise:true}));
+    [...clust1,...clust2,...noise].forEach(p=>{
+      ctx.beginPath();ctx.arc(p.x,p.y,p.noise?4:5,0,Math.PI*2);
+      ctx.fillStyle=p.noise?noiseColor:p.x<200?'#4f8ef760':'#f472b660';ctx.fill();
+      if(p.noise){ctx.strokeStyle=noiseStroke;ctx.lineWidth=1;ctx.stroke();}
+    });
+    ctx.fillStyle=textColor;ctx.font='10px Inter';ctx.fillText('● Cluster 1  ● Cluster 2  ○ Noise',10,155);
+  }
+  else {
+    // Generic placeholder
+    ctx.fillStyle='#353c55';ctx.font='13px Inter';ctx.textAlign='center';
+    ctx.fillText('Visualization coming soon',w/2,h/2);
+    ctx.textAlign='left';
+  }
+}
+
+// ── THEME ─────────────────────────────────────────────────────────────────────
+function toggleTheme(){
+  const isDark = document.documentElement.classList.toggle('dark');
+  localStorage.setItem('ml-theme', isDark ? 'dark' : 'light');
+}
+// Apply saved theme on load (default = light)
+(function(){
+  if(localStorage.getItem('ml-theme')==='dark') document.documentElement.classList.add('dark');
+})();
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+renderGrids();
+showTab('overview');
+</script>
+</body>
+</html>
